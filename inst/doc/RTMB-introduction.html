@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Kasper Kristensen" />
+
+<meta name="date" content="2024-04-23" />
+
+<title>Introduction to RTMB</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Introduction to RTMB</h1>
+<h4 class="author">Kasper Kristensen</h4>
+<h4 class="date">2024-04-23</h4>
+
+
+<div id="TOC">
+<ul>
+<li><a href="#introduction" id="toc-introduction">Introduction</a></li>
+<li><a href="#random-regression" id="toc-random-regression">Random
+regression</a>
+<ul>
+<li><a href="#getting-the-data" id="toc-getting-the-data">Getting the
+data</a></li>
+<li><a href="#defining-a-model" id="toc-defining-a-model">Defining a
+model</a></li>
+<li><a href="#implementing-the-model-in-rtmb" id="toc-implementing-the-model-in-rtmb">Implementing the model in
+RTMB</a></li>
+<li><a href="#fitting-the-model" id="toc-fitting-the-model">Fitting the
+model</a></li>
+<li><a href="#calculating-model-output" id="toc-calculating-model-output">Calculating model output</a></li>
+<li><a href="#simulating-from-the-model-object" id="toc-simulating-from-the-model-object">Simulating from the model
+object</a></li>
+<li><a href="#checking-correctness-of-the-implementation-using-simulation" id="toc-checking-correctness-of-the-implementation-using-simulation">Checking
+correctness of the implementation using simulation</a></li>
+<li><a href="#goodness-of-fit-using-quantile-residuals" id="toc-goodness-of-fit-using-quantile-residuals">Goodness-of-fit using
+quantile residuals</a></li>
+</ul></li>
+<li><a href="#debugging" id="toc-debugging">Debugging</a></li>
+<li><a href="#probabilistic-syntax" id="toc-probabilistic-syntax">Probabilistic syntax</a></li>
+</ul>
+</div>
+
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>This vignette demonstrates basic features of <code>RTMB</code> by
+implementing a <em>random regression</em> model from scratch and fit it
+to a built-in R dataset.</p>
+</div>
+<div id="random-regression" class="section level1">
+<h1>Random regression</h1>
+<div id="getting-the-data" class="section level2">
+<h2>Getting the data</h2>
+<p>We’ll take as starting point the built-in data set ‘ChickWeight’:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">data</span>(ChickWeight)</span></code></pre></div>
+<p>The data contains <code>weight</code> of 50 chicks by
+<code>Time</code> and individual identifier <code>Chick</code>. A useful
+plot of growth by individual is available from the help page by running
+<code>example(ChickWeight)</code>.</p>
+</div>
+<div id="defining-a-model" class="section level2">
+<h2>Defining a model</h2>
+<p>Although not the most natural based on the plot, we’ll setup a
+<em>random regression model</em>. It is defined by first drawing slopes
+and intercepts by individual from an underlying distribution</p>
+<p><span class="math display">\[ a_1,...,a_{50} \sim N(\mu_a ,
+\sigma_a^2) \]</span></p>
+<p><span class="math display">\[ b_1,...,b_{50} \sim N(\mu_b ,
+\sigma_b^2) \]</span></p>
+<p>and then state a normal regression given these random
+coefficients:</p>
+<p><span class="math display">\[ \text{weight}_{i} \sim
+N(a_{\text{Chick}_i} * \text{Time}_i + b_{\text{Chick}_i}, \sigma^2)
+\]</span></p>
+</div>
+<div id="implementing-the-model-in-rtmb" class="section level2">
+<h2>Implementing the model in RTMB</h2>
+<p>To implement the model in RTMB we have to set up the objective
+function and define the parameters and random effects.</p>
+<p>Parameter objects are gathered in a list that also serves as initial
+guess when fitting the model:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>parameters <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>    <span class="at">mua=</span><span class="dv">0</span>,          <span class="do">## Mean slope</span></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>    <span class="at">sda=</span><span class="dv">1</span>,          <span class="do">## Std of slopes</span></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>    <span class="at">mub=</span><span class="dv">0</span>,          <span class="do">## Mean intercept</span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>    <span class="at">sdb=</span><span class="dv">1</span>,          <span class="do">## Std of intercepts</span></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>    <span class="at">sdeps=</span><span class="dv">1</span>,        <span class="do">## Residual Std</span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>    <span class="at">a=</span><span class="fu">rep</span>(<span class="dv">0</span>, <span class="dv">50</span>),   <span class="do">## Random slope by chick</span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>    <span class="at">b=</span><span class="fu">rep</span>(<span class="dv">0</span>, <span class="dv">50</span>)    <span class="do">## Random intercept by chick</span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>)</span></code></pre></div>
+<p>The objective function takes as input such a parameter list, and is
+defined by</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>f <span class="ot">&lt;-</span> <span class="cf">function</span>(parms) {</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>    <span class="fu">getAll</span>(ChickWeight, parms, <span class="at">warn=</span><span class="cn">FALSE</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>    <span class="do">## Optional (enables extra RTMB features)</span></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>    weight <span class="ot">&lt;-</span> <span class="fu">OBS</span>(weight)</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>    <span class="do">## Initialize joint negative log likelihood</span></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>    nll <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>    <span class="do">## Random slopes</span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>    nll <span class="ot">&lt;-</span> nll <span class="sc">-</span> <span class="fu">sum</span>(<span class="fu">dnorm</span>(a, <span class="at">mean=</span>mua, <span class="at">sd=</span>sda, <span class="at">log=</span><span class="cn">TRUE</span>))</span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a>    <span class="do">## Random intercepts</span></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a>    nll <span class="ot">&lt;-</span> nll <span class="sc">-</span> <span class="fu">sum</span>(<span class="fu">dnorm</span>(b, <span class="at">mean=</span>mub, <span class="at">sd=</span>sdb, <span class="at">log=</span><span class="cn">TRUE</span>))</span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a>    <span class="do">## Data</span></span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a>    predWeight <span class="ot">&lt;-</span> a[Chick] <span class="sc">*</span> Time <span class="sc">+</span> b[Chick]</span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a>    nll <span class="ot">&lt;-</span> nll <span class="sc">-</span> <span class="fu">sum</span>(<span class="fu">dnorm</span>(weight, predWeight, <span class="at">sd=</span>sdeps, <span class="at">log=</span><span class="cn">TRUE</span>))</span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a>    <span class="do">## Get predicted weight uncertainties</span></span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a>    <span class="fu">ADREPORT</span>(predWeight)</span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a>    <span class="do">## Return</span></span>
+<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a>    nll</span>
+<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a>}</span></code></pre></div>
+<p>This function calculates the negative log likelihood <code>nll</code>
+using straight forward R operations corresponding exactly to the model
+definition. In addition, some RTMB specific statements are used:</p>
+<ul>
+<li>The <code>getAll</code> function makes all the list elements of data
+and parameters visible inside the function, so that one can write
+e.g. <code>weight</code> rather than
+<code>ChickWeight$weight</code>.</li>
+<li>The <code>weight &lt;- OBS(weight)</code> statement tells RTMB that
+that <code>weight</code> is the response. This is needed to enable
+automatic simulation and residual calculations from the model
+object.</li>
+<li>The <code>ADREPORT(predWeight)</code> statement tells RTMB that we
+want uncertainties for this intermediate calculation.</li>
+</ul>
+<p>The objective function <code>f</code> is processed by RTMB using the
+call</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>obj <span class="ot">&lt;-</span> <span class="fu">MakeADFun</span>(f, parameters, <span class="at">random=</span><span class="fu">c</span>(<span class="st">&quot;a&quot;</span>, <span class="st">&quot;b&quot;</span>))</span></code></pre></div>
+<p>where we also specify that <code>a</code> and <code>b</code> are
+random effects.</p>
+</div>
+<div id="fitting-the-model" class="section level2">
+<h2>Fitting the model</h2>
+<p>We optimize the model using <code>nlminb</code> (or any other
+suitable gradient based optimizer in R)</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>opt <span class="ot">&lt;-</span> <span class="fu">nlminb</span>(obj<span class="sc">$</span>par, obj<span class="sc">$</span>fn, obj<span class="sc">$</span>gr)</span></code></pre></div>
+</div>
+<div id="calculating-model-output" class="section level2">
+<h2>Calculating model output</h2>
+<p>Uncertainties are now calculated using</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>sdr <span class="ot">&lt;-</span> <span class="fu">sdreport</span>(obj)</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>sdr</span></code></pre></div>
+<pre><code>## sdreport(.) result
+##        Estimate Std. Error
+## mua    8.467355  0.5010482
+## sda    3.463551  0.3630097
+## mub   29.044188  1.8040325
+## sdb   10.541116  1.5588779
+## sdeps 12.890654  0.4237485
+## Maximum gradient component: 1.117405e-05</code></pre>
+<p>By default, the shown output is very brief, containing only the model
+parameters. The <code>sdr</code> object contains much more. It is often
+convenient to inspect parameter estimates and other output as a list
+similar to the one containing the parameters. For instance, to get
+parameters estimates and standard errors as separate lists use:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="fu">as.list</span>(sdr, <span class="st">&quot;Est&quot;</span>) <span class="do">## parameter estimates</span></span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="fu">as.list</span>(sdr, <span class="st">&quot;Std&quot;</span>) <span class="do">## parameter uncertainties</span></span></code></pre></div>
+<p>Pass <code>report=TRUE</code> to get <code>ADREPORT</code>ed
+quantities:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="fu">as.list</span>(sdr, <span class="st">&quot;Est&quot;</span>, <span class="at">report=</span><span class="cn">TRUE</span>) <span class="do">## ADREPORT estimates</span></span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a><span class="fu">as.list</span>(sdr, <span class="st">&quot;Std&quot;</span>, <span class="at">report=</span><span class="cn">TRUE</span>) <span class="do">## ADREPORT uncertainties</span></span></code></pre></div>
+</div>
+<div id="simulating-from-the-model-object" class="section level2">
+<h2>Simulating from the model object</h2>
+<p>New datasets can be generated from the estimated model using
+<code>obj$simulate()</code> assuming that the model is implemented in
+accordance with the principles defined in the help page
+<code>?Simulation</code>.</p>
+</div>
+<div id="checking-correctness-of-the-implementation-using-simulation" class="section level2">
+<h2>Checking correctness of the implementation using simulation</h2>
+<p>When building random effect models from scratch, many mistakes can be
+made leading to wrong results. We always recommend to run the model
+through the completely automatic consistency check (this requires that
+<code>obj$simulate()</code> works for the implementation). By default,
+the check simulates 100 datasets and calculates gradients for each
+replicate. A standard output tells you whether the implementation is
+consistent with simulation (message ‘simulation appears to be correct’).
+It also gives an idea of the parameter bias usually caused by the
+Laplace approximation (not an issue for the random regression model for
+which the Laplace approximation is exact). We run the standard check
+by:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>chk <span class="ot">&lt;-</span> <span class="fu">checkConsistency</span>(obj)</span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>chk</span></code></pre></div>
+<pre><code>## Parameters used for simulation:
+##       mua       sda       mub       sdb     sdeps 
+##  8.467355  3.463551 29.044188 10.541116 12.890654 
+## 
+## Test correct simulation (p.value):
+## [1] 0.916118
+## Simulation appears to be correct
+## 
+## Estimated parameter bias:
+##          mua          sda          mub          sdb        sdeps 
+##  0.041037447 -0.001069032 -0.092780844  0.057738402  0.027244614</code></pre>
+<p>As expected for this case, everything looks fine. A complete
+simulation study, that re-estimates parameters for each replicate, can
+also be performed although that takes longer to run:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>chk <span class="ot">&lt;-</span> <span class="fu">checkConsistency</span>(obj, <span class="at">estimate=</span><span class="cn">TRUE</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a><span class="fu">summary</span>(chk)</span></code></pre></div>
+<p>For more details we refer to the help page
+<code>?TMB::checkConsistency</code>.</p>
+</div>
+<div id="goodness-of-fit-using-quantile-residuals" class="section level2">
+<h2>Goodness-of-fit using quantile residuals</h2>
+<p>Quantile residuals can be generated automatically using the
+<code>oneStepPredict</code> function. These residuals are conceptually
+superior to other methods (e.g. Pearson residuals), but much trickier to
+calculate. It is very important to specify an appropriate
+<code>method</code> (see <code>?TMB::oneStepPredict</code>) because
+using an inappropriate method can give wrong residuals. For the random
+regression model the ‘fullGaussian’ method is computationally exact.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>osa <span class="ot">&lt;-</span> <span class="fu">oneStepPredict</span>(obj, <span class="at">method=</span><span class="st">&quot;fullGaussian&quot;</span>, <span class="at">discrete=</span><span class="cn">FALSE</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a><span class="fu">qqnorm</span>(osa<span class="sc">$</span>res); <span class="fu">abline</span>(<span class="dv">0</span>,<span class="dv">1</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p>The argument <code>discrete=FALSE</code> is necessary in this case
+because the data has duplicates, which is a zero-probability event for
+continuous distributions. If the model is correct, the residuals are
+standard, independent normally distributed, which is obviously not the
+case here.</p>
+</div>
+</div>
+<div id="debugging" class="section level1">
+<h1>Debugging</h1>
+<p>For the random regression model, we could run <code>MakeADFun</code>
+without problems. However, model implementation might not always work as
+smoothly. In case of errors it is useful to test the implementation
+step-wise.</p>
+<ol style="list-style-type: decimal">
+<li><p>Going back to our objective function <code>f</code>, first step
+is to check that you can evaluate the function as a normal R
+function:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="fu">f</span>(parameters)</span></code></pre></div>
+<p>An error at this point is obviously not due to
+<code>RTMB</code>.</p></li>
+<li><p>Next, it is useful to check that <code>MakeADFun</code> can be
+run <em>without</em> random effects:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a>obj <span class="ot">&lt;-</span> <span class="fu">MakeADFun</span>(f, parameters)</span></code></pre></div>
+<p>Should an error occur at this point, you can enable standard R
+debugging <code>debug(f)</code> and run <code>MakeADFun</code> again to
+figure out which code line caused the error. A common cause is to that
+an unsupported (e.g. non-differentiable) operation has been
+used.</p></li>
+<li><p>Once <code>obj</code> has been constructed successfully, you
+should evaluate it</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a>obj<span class="sc">$</span><span class="fu">fn</span>()</span></code></pre></div>
+<p>and verify that it gives the same result as
+<code>f(parameters)</code>.</p></li>
+</ol>
+</div>
+<div id="probabilistic-syntax" class="section level1">
+<h1>Probabilistic syntax</h1>
+<p>The random regression model could alternatively have been written
+using the RTMB ‘tilde operator’ (<code>%~%</code>):</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a>f2 <span class="ot">&lt;-</span> <span class="cf">function</span>(parms) {</span>
+<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a>    <span class="fu">getAll</span>(ChickWeight, parms, <span class="at">warn=</span><span class="cn">FALSE</span>)</span>
+<span id="cb17-3"><a href="#cb17-3" tabindex="-1"></a>    <span class="do">## Optional (enables extra RTMB features)</span></span>
+<span id="cb17-4"><a href="#cb17-4" tabindex="-1"></a>    weight <span class="ot">&lt;-</span> <span class="fu">OBS</span>(weight)</span>
+<span id="cb17-5"><a href="#cb17-5" tabindex="-1"></a>    <span class="do">## Random slopes</span></span>
+<span id="cb17-6"><a href="#cb17-6" tabindex="-1"></a>    a <span class="sc">%~%</span> <span class="fu">dnorm</span>(<span class="at">mean=</span>mua, <span class="at">sd=</span>sda)</span>
+<span id="cb17-7"><a href="#cb17-7" tabindex="-1"></a>    <span class="do">## Random intercepts</span></span>
+<span id="cb17-8"><a href="#cb17-8" tabindex="-1"></a>    b <span class="sc">%~%</span> <span class="fu">dnorm</span>(<span class="at">mean=</span>mub, <span class="at">sd=</span>sdb)</span>
+<span id="cb17-9"><a href="#cb17-9" tabindex="-1"></a>    <span class="do">## Data</span></span>
+<span id="cb17-10"><a href="#cb17-10" tabindex="-1"></a>    predWeight <span class="ot">&lt;-</span> a[Chick] <span class="sc">*</span> Time <span class="sc">+</span> b[Chick]</span>
+<span id="cb17-11"><a href="#cb17-11" tabindex="-1"></a>    weight <span class="sc">%~%</span> <span class="fu">dnorm</span>(predWeight, <span class="at">sd=</span>sdeps)</span>
+<span id="cb17-12"><a href="#cb17-12" tabindex="-1"></a>    <span class="do">## Get predicted weight uncertainties</span></span>
+<span id="cb17-13"><a href="#cb17-13" tabindex="-1"></a>    <span class="fu">ADREPORT</span>(predWeight)</span>
+<span id="cb17-14"><a href="#cb17-14" tabindex="-1"></a>}</span></code></pre></div>
+<p>This syntax is closer to other probabilistic languages (e.g. BUGS,
+JAGS and Stan). But more importantly, it prevents some very common TMB
+mistakes, by passing <code>log=TRUE</code> automatically and making sure
+the sign of the objective function is correct.</p>
+<p>Otherwise, <code>f2</code> is identical to <code>f</code>, and the
+model object can be constructed and fitted in the same way:</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a>obj <span class="ot">&lt;-</span> <span class="fu">MakeADFun</span>(f2, parameters, <span class="at">random=</span><span class="fu">c</span>(<span class="st">&quot;a&quot;</span>, <span class="st">&quot;b&quot;</span>))</span></code></pre></div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
